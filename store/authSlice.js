@@ -1,5 +1,7 @@
 
 import {createSlice} from '@reduxjs/toolkit'
+import axios from 'axios'
+import STATUSES from '../src/globals/status/statuses'
 
 // createSlice is the objects which will contains the objects as the parameter and it can contains more than one objects as a parameters
 // Objects are the key and value pairs
@@ -40,3 +42,65 @@ export const {setStatus,setUser,setToken} =  authSlice.actions
 
 // exporting the authSlice which will contains the .reducer as a extension and this reducer will combine all the slice too
 export default authSlice.reducer
+
+
+
+
+
+// Creating async thunk in reduxtoolkit
+
+// for register
+export function register(data){
+  // this data will holds the info that the user enter in the register forms
+  // and should return asunc fun
+
+
+  //
+  return async function registerThunk(dispatch){
+    // dispatch will invoke
+    
+    dispatch(setStatus(STATUSES.LOADING))
+    // everytime we dispatch payload is sent and payload contains data i.e statuses.loading
+    try{
+        const response = await axios.post('https://react30.onrender.com/api/user/register',data)
+     
+        // checking the status
+        if(response.status === 201){
+            dispatch(sxetUser(data))
+           dispatch(setStatus(STATUSES.SUCCESS))
+        }else{
+            dispatch(setStatus(STATUSES.ERROR))
+        }
+    }catch (error){
+        dispatch(setStatus(STATUSES.ERROR))
+    }
+}
+
+}
+
+
+
+
+
+
+
+// for login
+
+export function login(data){
+    return async function loginThunk(dispatch){
+        dispatch(setStatus(STATUSES.LOADING))
+   try{
+    const response =  await axios.post('https://react30.onrender.com/api/user/login',data)
+    if (response.status === 201 && response.data.token){
+     dispatch(setToken(response.data.token))
+     dispatch(setStatus(STATUSES.SUCCESS))
+    }else{
+     dispatch(setStatus(STATUSES.ERROR))
+    }
+   }catch(error){
+    dispatch(setStatus(STATUSES.ERROR))
+   }
+    }
+}
+
+// After exporting we just have to call the funtion only
