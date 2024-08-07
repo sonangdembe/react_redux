@@ -13,7 +13,8 @@ const store = configureStore({
         // here we can use any name but use the name that we declared previously in the slice according to it
         // if we donn't entry then declare slice won't be working
         auth : authSlice,
-        blog : blogSlice
+        blog : blogSlice 
+        
     }
 
 })

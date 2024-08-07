@@ -66,7 +66,7 @@ export function register(data){
      
         // checking the status
         if(response.status === 201){
-            dispatch(sxetUser(data))
+            dispatch(setUser(data))
            dispatch(setStatus(STATUSES.SUCCESS))
         }else{
             dispatch(setStatus(STATUSES.ERROR))
@@ -91,7 +91,7 @@ export function login(data){
         dispatch(setStatus(STATUSES.LOADING))
    try{
     const response =  await axios.post('https://react30.onrender.com/api/user/login',data)
-    if (response.status === 201 && response.data.token){
+    if (response.status === 200 && response.data.token){
      dispatch(setToken(response.data.token))
      dispatch(setStatus(STATUSES.SUCCESS))
     }else{
