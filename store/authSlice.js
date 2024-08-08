@@ -2,6 +2,7 @@
 import {createSlice} from '@reduxjs/toolkit'
 import axios from 'axios'
 import STATUSES from '../src/globals/status/statuses'
+import API from '../src/http'
 
 // createSlice is the objects which will contains the objects as the parameter and it can contains more than one objects as a parameters
 // Objects are the key and value pairs
@@ -62,7 +63,7 @@ export function register(data){
     dispatch(setStatus(STATUSES.LOADING))
     // everytime we dispatch payload is sent and payload contains data i.e statuses.loading
     try{
-        const response = await axios.post('https://react30.onrender.com/api/user/register',data)
+        const response = await API.post('register',data)
      
         // checking the status
         if(response.status === 201){
@@ -90,7 +91,7 @@ export function login(data){
     return async function loginThunk(dispatch){
         dispatch(setStatus(STATUSES.LOADING))
    try{
-    const response =  await axios.post('https://react30.onrender.com/api/user/login',data)
+    const response =  await API.post('/login',data)
     if (response.status === 200 && response.data.token){
      dispatch(setToken(response.data.token))
      dispatch(setStatus(STATUSES.SUCCESS))

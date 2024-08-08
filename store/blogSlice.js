@@ -1,57 +1,88 @@
-
-import {createSlice} from '@reduxjs/toolkit'
-
-// createSlice is the objects which will contains the objects as the parameter and it can contains more than one objects as a parameters
-// Objects are the key and value pairs
+import { createSlice } from '@reduxjs/toolkit';
+import STATUSES from '../src/globals/status/statuses';
+import API from '../src/http';
 
 const blogSlice = createSlice({
-   name : "blog",
-   initialState : {
-    // repeatedly we this so we have to declare and store in slice
-    // this is the beauty of redux toolkit
-    title : null ,    
-    subtitle : null,
-     category: null,
-     image : null,
-     description: null   
-   },
+  name: 'blog',
+  initialState: {
+    status: null,
+    data: null,
+  },
+  reducers: {
+    setStatus(state, action) {
+      state.status = action.payload;
+    },
+    setBlog(state, action) {
+      state.data = action.payload;
+    },
+  },
+});
 
+export const { setStatus, setBlog } = blogSlice.actions;
+export default blogSlice.reducer;
 
-   // now here comes the reducer which is alos reducer
-   reducers : {
-   // as a convention you can use word <set>as prefix or you use any word but conventions
-    setTitle(state,action){
-        state.title = action.payload
-        // this state is above declared state [ user, token, status]
-        // this state.status will store the data that action.payload  is currently containing it may be loading, fail
-    },
-    setSubtitle(state,action){
-        state.subtitle = action.payload
-    },
-    setCategory(state,action){
-        state.category = action.payload
-    },
-    setImage(state,action){
-        state.image = action.payload
-    },
-    setDescription(state,action){
-        state.description= action.payload
+export function addBlog(data) {
+  return async function addBlogThunk(dispatch) {
+    dispatch(setStatus(STATUSES.LOADING));
+    try {
+      const response = await API.post('blog', data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      console.log('API response:', response);
+
+      if (response.status === 201) {
+        dispatch(setStatus(STATUSES.SUCCESS));
+      } else {
+        dispatch(setStatus(STATUSES.ERROR));
+      }
+    } catch (error) {
+      console.error('API error:', error);
+      dispatch(setStatus(STATUSES.ERROR));
     }
-   } 
-})
+  };
+}
 
+export function fetchBlog() {
+  return async function fetchBlogThunk(dispatch) {
+    dispatch(setStatus(STATUSES.LOADING));
+    try {
+      const response = await API.get('blog');
+      console.log('API response:', response);
 
-// this above is slice and now have to make action in redux toolkit which can be made with a line of code
-
-// name should be same as the reducer which we will be invoking and now this are callled actions
-export const {setTitle,setSubtitle,setCategory,setImage,setDescription} =  blogSlice.actions
-
-// exporting the authSlice which will contains the .reducer as a extension
-export default blogSlice.reducer
-
-
-function addBlog(data){
-    return async function addBlogThunk(dispatch){
-
+      if (response.status === 201 && response.data.blog.length > 0) {
+        dispatch(setBlog(response.data.blog));
+        dispatch(setStatus(STATUSES.SUCCESS));
+      } else {
+        dispatch(setStatus(STATUSES.ERROR));
+      }
+    } catch (error) {
+      console.error('API error:', error);
+      dispatch(setStatus(STATUSES.ERROR));
     }
+  };
+}
+
+export function deleteBlog(id, token) {
+  return async function deleteBlogThunk(dispatch) {
+    dispatch(setStatus(STATUSES.LOADING));
+    try {
+      const response = await API.delete(`blog/${id}`, {
+        headers: {
+          token: token,
+        },
+      });
+      console.log('API response:', response);
+
+      if (response.status === 201) {
+        dispatch(setStatus(STATUSES.SUCCESS));
+      } else {
+        dispatch(setStatus(STATUSES.ERROR));
+      }
+    } catch (error) {
+      console.error('API error:', error);
+      dispatch(setStatus(STATUSES.ERROR));
+    }
+  };
 }
